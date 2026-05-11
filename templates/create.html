@@ -72,10 +72,18 @@
         
         <div class="form-actions">
             <button type="submit" class="btn-primary">
-                <svg class="icon icon--sm">
-                    <use href="#icon-check"></use>
+                <svg class="icon">
+                    <use href="#icon-plus"></use>
                 </svg>
                 Создать задачу
+            </button>
+            <a href="{{ url_for('index', telegram_id=telegram_id) }}" class="btn-secondary">
+                <svg class="icon">
+                    <use href="#icon-x"></use>
+                </svg>
+                Отмена
+            </a>
+        </div>
             </button>
             <a href="{{ url_for('index', telegram_id=request.args.get('telegram_id', 123456)) }}" 
                class="btn-secondary">

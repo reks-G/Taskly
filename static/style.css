@@ -459,27 +459,55 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
+  padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-full);
   font-size: var(--font-size-sm);
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid transparent;
   backdrop-filter: var(--blur-sm);
   -webkit-backdrop-filter: var(--blur-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before,
+.btn-success::before,
+.btn-danger::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-primary:hover::before,
+.btn-success:hover::before,
+.btn-danger:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .btn-primary {
   background: var(--color-primary);
   color: var(--color-bg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
 }
 
 .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-secondary {
@@ -490,37 +518,75 @@ body {
 
 .btn-secondary:hover {
   background: var(--color-hover);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
 }
 
 .btn-success {
-  background: var(--color-success);
+  background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
   color: white;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .btn-success:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-success:active {
+  transform: translateY(0);
 }
 
 .btn-danger {
-  background: var(--color-error);
+  background: linear-gradient(135deg, var(--color-error) 0%, #DC2626 100%);
   color: white;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .btn-danger:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+.btn-danger:active {
+  transform: translateY(0);
 }
 
 .btn-primary .icon,
 .btn-secondary .icon,
 .btn-success .icon,
 .btn-danger .icon {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
+  position: relative;
+  z-index: 1;
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-xs);
+  gap: var(--space-1);
+}
+
+.btn-sm .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.btn-lg {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--font-size-base);
+}
+
+.btn-lg .icon {
+  width: 20px;
+  height: 20px;
 }
 
 /* Forms */
@@ -546,6 +612,13 @@ form {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
 }
 
 .form-field {
@@ -804,6 +877,39 @@ select {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-2xl);
   padding: var(--space-10);
+}
+
+.detail-container {
+  max-width: 900px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-6);
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: var(--color-text);
+}
+
+.back-link .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.detail-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-6);
 }
 
 .task-detail__header {

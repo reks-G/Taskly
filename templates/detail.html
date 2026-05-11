@@ -82,10 +82,10 @@
         <!-- Action Buttons -->
         <div class="detail-actions">
             <a href="{{ url_for('edit_task', task_id=task.id, telegram_id=telegram_id) }}" 
-               class="btn-primary"
+               class="btn-secondary"
                aria-label="Редактировать задачу">
-                <svg class="icon icon--sm">
-                    <use href="#icon-settings"></use>
+                <svg class="icon">
+                    <use href="#icon-edit"></use>
                 </svg>
                 Редактировать
             </a>
@@ -93,7 +93,7 @@
             <a href="{{ url_for('complete_task', task_id=task.id, telegram_id=telegram_id) }}" 
                class="btn-success"
                aria-label="Отметить задачу как выполненную">
-                <svg class="icon icon--sm">
+                <svg class="icon">
                     <use href="#icon-check"></use>
                 </svg>
                 Завершить
@@ -103,7 +103,7 @@
                class="btn-danger"
                onclick="return confirm('Вы уверены что хотите удалить эту задачу?')"
                aria-label="Удалить задачу">
-                <svg class="icon icon--sm">
+                <svg class="icon">
                     <use href="#icon-trash"></use>
                 </svg>
                 Удалить
