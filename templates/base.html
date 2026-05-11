@@ -39,7 +39,9 @@
                     </a>
                 </li>
                 <li class="sidebar__nav-item">
-                    <a href="#" class="sidebar__nav-link">
+                    <a href="{{ url_for('calendar', telegram_id=request.args.get('telegram_id', 123456)) }}" 
+                       class="sidebar__nav-link {% if request.endpoint == 'calendar' %}sidebar__nav-link--active{% endif %}"
+                       {% if request.endpoint == 'calendar' %}aria-current="page"{% endif %}>
                         <svg class="icon">
                             <use href="#icon-calendar"></use>
                         </svg>
@@ -47,7 +49,9 @@
                     </a>
                 </li>
                 <li class="sidebar__nav-item">
-                    <a href="#" class="sidebar__nav-link">
+                    <a href="{{ url_for('notifications', telegram_id=request.args.get('telegram_id', 123456)) }}" 
+                       class="sidebar__nav-link {% if request.endpoint == 'notifications' %}sidebar__nav-link--active{% endif %}"
+                       {% if request.endpoint == 'notifications' %}aria-current="page"{% endif %}>
                         <svg class="icon">
                             <use href="#icon-bell"></use>
                         </svg>

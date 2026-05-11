@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Календарь - TaskControl{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="topbar">
+        <h1 class="topbar__title">📅 Календарь</h1>
+        <a href="{{ url_for('index', telegram_id=telegram_id) }}" class="btn-secondary">
+            <svg class="icon"><use href="#icon-arrow-left"></use></svg>
+            Назад
+        </a>
+    </div>
+
+    <div class="calendar-view">
+        {% if tasks %}
+            {% set current_month = None %}
+            {% for task in tasks %}
+                {% if task.due_at %}
+                    {% set task_month = task.due_at.strftime('%B %Y') %}
+                    {% if task_month != current_month %}
+                        {% set current_month = task_month %}
+                        <div class="calendar-month">
+                            <h2 class="calendar-month__title">{{ task.due_at.strftime('%B %Y') }}</h2>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="calendar-item">
+                        <div class="calendar-item__date">
+                            <div class="calendar-item__day">{{ task.due_at.strftime('%d') }}</div>
+                            <div class="calendar-item__weekday">{{ task.due_at.strftime('%a') }}</div>
+                        </div>
+                        <div class="calendar-item__content">
+                            <a href="{{ url_for('task_detail', task_id=task.id, telegram_id=telegram_id) }}" class="calendar-item__title">
+                                {{ task.title }}
+                            </a>
+                            <div class="calendar-item__meta">
+                                <span class="priority priority--{{ task.priority.value }}">
+                                    {{ priority_levels[task.priority.value] }} {{ task.priority.value|upper }}
+                                </span>
+                                <span class="status status--{{ task.status.value }}">
+                                    {{ status_types[task.status.value] }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <svg class="empty-state__icon"><use href="#icon-calendar"></use></svg>
+                <h3 class="empty-state__title">Нет задач с датами</h3>
+                <p class="empty-state__text">Добавьте дедлайны к задачам, чтобы увидеть их в календаре</p>
+                <a href="{{ url_for('create_task', telegram_id=telegram_id) }}" class="btn-primary">
+                    <svg class="icon"><use href="#icon-plus"></use></svg>
+                    Создать задачу
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

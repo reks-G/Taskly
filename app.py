@@ -246,6 +246,38 @@ def edit_task(task_id):
                          telegram_id=telegram_id, 
                          errors=errors)
 
+@app.route('/calendar')
+def calendar():
+    telegram_id = request.args.get('telegram_id', 123456)
+    user_id = get_or_create_user(telegram_id)
+    
+    session = get_session()
+    # Получить все задачи с датами
+    tasks = session.query(Task).filter_by(user_id=user_id).filter(Task.due_at.isnot(None)).order_by(Task.due_at).all()
+    session.close()
+    
+    return render_template('calendar.html', 
+                         tasks=tasks, 
+                         telegram_id=telegram_id,
+                         priority_levels=PRIORITY_LEVELS,
+                         status_types=STATUS_TYPES)
+
+@app.route('/notifications')
+def notifications():
+    telegram_id = request.args.get('telegram_id', 123456)
+    user_id = get_or_create_user(telegram_id)
+    
+    session = get_session()
+    # Получить последние задачи как "уведомления"
+    tasks = session.query(Task).filter_by(user_id=user_id).order_by(Task.created_at.desc()).limit(20).all()
+    session.close()
+    
+    return render_template('notifications.html', 
+                         tasks=tasks, 
+                         telegram_id=telegram_id,
+                         priority_levels=PRIORITY_LEVELS,
+                         status_types=STATUS_TYPES)
+
 if __name__ == '__main__':
     init_db()
     app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)

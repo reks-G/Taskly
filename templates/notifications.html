@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Уведомления - TaskControl{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="topbar">
+        <h1 class="topbar__title">🔔 Уведомления</h1>
+        <a href="{{ url_for('index', telegram_id=telegram_id) }}" class="btn-secondary">
+            <svg class="icon"><use href="#icon-arrow-left"></use></svg>
+            Назад
+        </a>
+    </div>
+
+    <div class="notifications-list">
+        {% if tasks %}
+            {% for task in tasks %}
+                <div class="notification-item">
+                    <div class="notification-item__icon">
+                        {% if task.status.value == 'completed' %}
+                            <svg class="icon icon--success"><use href="#icon-check"></use></svg>
+                        {% else %}
+                            <svg class="icon icon--primary"><use href="#icon-bell"></use></svg>
+                        {% endif %}
+                    </div>
+                    <div class="notification-item__content">
+                        <a href="{{ url_for('task_detail', task_id=task.id, telegram_id=telegram_id) }}" class="notification-item__title">
+                            {{ task.title }}
+                        </a>
+                        <div class="notification-item__meta">
+                            <span class="status status--{{ task.status.value }}">
+                                {{ status_types[task.status.value] }}
+                            </span>
+                            {% if task.due_at %}
+                                <span class="notification-item__date">
+                                    {{ task.due_at.strftime('%d.%m.%Y %H:%M') }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% if task.description %}
+                            <p class="notification-item__text">{{ task.description[:100] }}{% if task.description|length > 100 %}...{% endif %}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <svg class="empty-state__icon"><use href="#icon-bell"></use></svg>
+                <h3 class="empty-state__title">Нет уведомлений</h3>
+                <p class="empty-state__text">Здесь будут отображаться ваши последние действия</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
