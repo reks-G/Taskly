@@ -54,8 +54,8 @@ def check_upcoming_tasks():
             session = get_session()
             now = datetime.now()
             
-            start_window = now + timedelta(minutes=25)
-            end_window = now + timedelta(minutes=35)
+            start_window = now + timedelta(minutes=10)
+            end_window = now + timedelta(minutes=20)
             
             tasks = session.query(Task).filter(
                 Task.due_at >= start_window,

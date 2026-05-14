@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Уведомления - TaskControl{% endblock %}
+{% block title %}Активность - TaskControl{% endblock %}
 
 {% block content %}
 <div class="main-content">
@@ -9,7 +9,7 @@
             <svg class="icon icon--lg" style="vertical-align: middle; margin-right: 12px;">
                 <use href="#icon-bell"></use>
             </svg>
-            Уведомления
+            Активность
         </h1>
         <a href="{{ url_for('index', telegram_id=telegram_id) }}" class="btn-secondary">
             <svg class="icon"><use href="#icon-arrow-left"></use></svg>
@@ -51,7 +51,7 @@
         {% else %}
             <div class="empty-state">
                 <svg class="empty-state__icon"><use href="#icon-bell"></use></svg>
-                <h3 class="empty-state__title">Нет уведомлений</h3>
+                <h3 class="empty-state__title">Нет активности</h3>
                 <p class="empty-state__text">Здесь будут отображаться ваши последние действия</p>
             </div>
         {% endif %}
