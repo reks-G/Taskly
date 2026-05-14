@@ -259,7 +259,7 @@ def notifications():
     
     session = get_session()
     now = datetime.now()
-    notification_window = now + timedelta(hours=24)
+    notification_window = now + timedelta(hours=2)
     
     tasks = session.query(Task).filter_by(user_id=user_id).filter(
         Task.due_at.isnot(None),
