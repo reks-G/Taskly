@@ -910,6 +910,16 @@ select[name="priority"] {
   margin-bottom: var(--space-6);
 }
 
+.empty-state__message {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+.empty-state__action {
+  margin-top: var(--space-4);
+}
+
 /* Calendar */
 .calendar-view {
   display: flex;
