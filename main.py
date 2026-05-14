@@ -1,8 +1,7 @@
 import threading
 from app import app
-from bot import bot
+from bot import bot, start_scheduler
 from database import init_db
-from scheduler import start_scheduler
 
 def run_bot():
     """Запуск Telegram бота"""
