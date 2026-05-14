@@ -5,7 +5,12 @@
 {% block content %}
 <div class="main-content">
     <div class="topbar">
-        <h1 class="topbar__title">🔔 Уведомления</h1>
+        <h1 class="topbar__title">
+            <svg class="icon icon--lg" style="vertical-align: middle; margin-right: 12px;">
+                <use href="#icon-bell"></use>
+            </svg>
+            Уведомления
+        </h1>
         <a href="{{ url_for('index', telegram_id=telegram_id) }}" class="btn-secondary">
             <svg class="icon"><use href="#icon-arrow-left"></use></svg>
             Назад

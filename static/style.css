@@ -264,6 +264,12 @@ body {
   font-weight: 700;
   color: var(--color-text);
   letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.topbar__title .icon {
+  flex-shrink: 0;
 }
 
 .topbar__controls {
