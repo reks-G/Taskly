@@ -91,8 +91,9 @@ def cleanup_old_tasks(session, now):
         week_ago = now - timedelta(days=7)
         
         old_tasks = session.query(Task).filter(
+            Task.due_at.isnot(None),
             Task.due_at < week_ago,
-            Task.status != StatusEnum.completed
+            Task.status.in_([StatusEnum.pending, StatusEnum.in_progress])
         ).all()
         
         if old_tasks:
