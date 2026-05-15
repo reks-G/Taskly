@@ -96,6 +96,8 @@ def create_task():
         priority = request.form.get('priority', 'medium')
         due_at_str = request.form.get('due_at', '')
         
+        print(f'DEBUG: Creating task - title={title}, priority={priority}, due_at={due_at_str}')
+        
         if not title:
             errors.append('Task title is required')
         elif len(title) > 500:
@@ -103,6 +105,7 @@ def create_task():
         
         if priority not in ['low', 'medium', 'high']:
             errors.append('Invalid priority value')
+            print(f'DEBUG: Invalid priority: {priority}')
         
         due_at = None
         if due_at_str:
@@ -125,12 +128,15 @@ def create_task():
             
             session.add(task)
             session.commit()
+            print(f'DEBUG: Task created successfully with ID: {task.id}')
             session.close()
             
             from bot import notify_task_created
             send_notification_async(telegram_id, notify_task_created, title)
             
             return redirect(url_for('index', telegram_id=telegram_id))
+        else:
+            print(f'DEBUG: Errors: {errors}')
     
     return render_template('create.html', telegram_id=telegram_id, errors=errors)
 
