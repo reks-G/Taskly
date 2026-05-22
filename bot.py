@@ -48,6 +48,33 @@ def start_handler(message):
         reply_markup=webapp_button()
     )
 
+@bot.callback_query_handler(func=lambda call: call.data.startswith('complete_'))
+def handle_complete_task(call):
+    try:
+        task_id = int(call.data.split('_')[1])
+        session = get_session()
+        task = session.query(Task).filter_by(id=task_id).first()
+        
+        if task:
+            task.status = StatusEnum.completed
+            task_title = task.title
+            session.commit()
+            
+            bot.answer_callback_query(call.id, '✅ Задача отмечена как выполненная!')
+            bot.edit_message_text(
+                f'✅ <b>Задача завершена!</b>\n\n<s>{task_title}</s>',
+                call.message.chat.id,
+                call.message.message_id,
+                parse_mode='HTML'
+            )
+        else:
+            bot.answer_callback_query(call.id, '❌ Задача не найдена')
+        
+        session.close()
+    except Exception as e:
+        print(f'Ошибка обработки callback: {e}')
+        bot.answer_callback_query(call.id, '❌ Произошла ошибка')
+
 def check_upcoming_tasks():
     while True:
         try:

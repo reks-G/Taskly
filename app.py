@@ -5,7 +5,7 @@ from functools import lru_cache
 import threading
 
 BOT_TOKEN = '8534316351:AAE-aCnUKL0jBNDlDV1jRaUjH_45Nhocggc'
-WEBAPP_URL = 'https://eecb50233c57b3f9-95-104-189-114.serveousercontent.com'
+WEBAPP_URL = 'https://taskcontrol-qu0a.onrender.com'
 
 PRIORITY_LEVELS = {
     'low': '🟢',
@@ -75,6 +75,7 @@ def index():
         query = query.filter(Task.status.in_([StatusEnum.pending, StatusEnum.in_progress]))
     
     tasks = query.order_by(Task.due_at).all()
+    print(f'DEBUG: Retrieved {len(tasks)} tasks for user_id={user_id}, filter={filter_type}')
     session.close()
     
     return render_template('index.html', 
@@ -90,7 +91,11 @@ def create_task():
     telegram_id = request.args.get('telegram_id', 123456)
     errors = []
     
+    print(f'DEBUG: /create route called - Method: {request.method}, telegram_id: {telegram_id}')
+    
     if request.method == 'POST':
+        print(f'DEBUG: Form data received: {dict(request.form)}')
+        
         title = request.form.get('title', '').strip()
         description = request.form.get('description', '').strip()
         priority = request.form.get('priority', 'medium')
@@ -116,6 +121,8 @@ def create_task():
         
         if not errors:
             user_id = get_or_create_user(telegram_id)
+            print(f'DEBUG: User ID: {user_id}')
+            
             session = get_session()
             
             task = Task(
@@ -126,10 +133,26 @@ def create_task():
                 priority=PriorityEnum[priority]
             )
             
+            print(f'DEBUG: Task object created: {task}')
             session.add(task)
-            session.commit()
-            print(f'DEBUG: Task created successfully with ID: {task.id}')
-            session.close()
+            print(f'DEBUG: Task added to session')
+            
+            try:
+                session.commit()
+                task_id = task.id
+                print(f'DEBUG: Task committed successfully with ID: {task_id}')
+                
+                verify_task = session.query(Task).filter_by(id=task_id).first()
+                if verify_task:
+                    print(f'DEBUG: Task verified in DB: ID={verify_task.id}, Title={verify_task.title}')
+                else:
+                    print(f'DEBUG: WARNING - Task not found after commit!')
+                    
+            except Exception as e:
+                print(f'DEBUG: Error during commit: {e}')
+                session.rollback()
+            finally:
+                session.close()
             
             from bot import notify_task_created
             send_notification_async(telegram_id, notify_task_created, title)
