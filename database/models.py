@@ -40,6 +40,6 @@ class Task(Base):
     due_at = Column(DateTime)
     priority = Column(Enum(PriorityEnum), default=PriorityEnum.medium)
     status = Column(Enum(StatusEnum), default=StatusEnum.pending)
-    notified = Column(Boolean, default=False)  # Флаг уведомления за 30 минут
+    notified = Column(Boolean, default=False)
     
     user = relationship('User', back_populates='tasks')

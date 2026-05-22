@@ -5,7 +5,6 @@ from database.models import Base
 
 DATABASE_URL = 'sqlite:///taskcontrol.db'
 
-# Оптимизированный engine для SQLite
 engine = create_engine(
     DATABASE_URL, 
     echo=False,

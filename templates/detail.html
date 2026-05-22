@@ -12,7 +12,6 @@
     </a>
     
     <div class="task-detail">
-        <!-- Task Header -->
         <div class="task-header" style="margin-bottom: var(--space-5);">
             <span class="priority" 
                   aria-label="Приоритет {{ task.priority.value }}"
@@ -22,7 +21,6 @@
             <h2 style="margin: 0;">{{ task.title }}</h2>
         </div>
         
-        <!-- Task Description -->
         {% if task.description %}
         <div style="margin-bottom: var(--space-6);">
             <h3 style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-bottom: var(--space-3);">
@@ -32,7 +30,6 @@
         </div>
         {% endif %}
         
-        <!-- Task Meta Information -->
         <div class="task-info">
             <div style="display: grid; gap: var(--space-4);">
                 <div>
@@ -79,7 +76,6 @@
             </div>
         </div>
         
-        <!-- Action Buttons -->
         <div class="detail-actions">
             <a href="{{ url_for('edit_task', task_id=task.id, telegram_id=telegram_id) }}" 
                class="btn-secondary"
