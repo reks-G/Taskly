@@ -133,7 +133,8 @@ def create_task():
                 title=title,
                 description=description if description else None,
                 due_at=due_at,
-                priority=PriorityEnum[priority]
+                priority=PriorityEnum[priority],
+                notified=False
             )
             
             session.add(task)
@@ -234,9 +235,14 @@ def edit_task(task_id):
             task.description = description if description else None
             task.due_at = due_at
             task.priority = PriorityEnum[priority]
+            task.notified = False
             
-            session.commit()
-            session.close()
+            try:
+                session.commit()
+            except Exception as e:
+                session.rollback()
+            finally:
+                session.close()
             
             return redirect(url_for('task_detail', task_id=task_id, telegram_id=telegram_id))
     
