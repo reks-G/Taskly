@@ -3,6 +3,10 @@ from database import get_session, User, Task, PriorityEnum, StatusEnum, init_db
 from datetime import datetime, timedelta
 from functools import lru_cache
 import threading
+import json
+import hmac
+import hashlib
+from urllib.parse import parse_qs
 
 BOT_TOKEN = '8534316351:AAE-aCnUKL0jBNDlDV1jRaUjH_45Nhocggc'
 WEBAPP_URL = 'https://taskcontrol-qu0a.onrender.com'
@@ -21,6 +25,26 @@ STATUS_TYPES = {
 }
 
 app = Flask(__name__)
+
+def get_telegram_user():
+    telegram_id = request.args.get('telegram_id')
+    if telegram_id:
+        try:
+            return int(telegram_id)
+        except:
+            pass
+    
+    init_data = request.headers.get('X-Telegram-Init-Data')
+    if init_data:
+        try:
+            parsed = parse_qs(init_data)
+            if 'user' in parsed:
+                user_data = json.loads(parsed['user'][0])
+                return user_data.get('id')
+        except:
+            pass
+    
+    return 123456
 
 def send_notification_async(telegram_id, notification_func, *args):
     def send():
@@ -48,12 +72,7 @@ def get_or_create_user(telegram_id):
 
 @app.route('/')
 def index():
-    telegram_id = request.args.get('telegram_id')
-    if not telegram_id:
-        telegram_id = 123456
-    else:
-        telegram_id = int(telegram_id)
-    
+    telegram_id = get_telegram_user()
     filter_type = request.args.get('filter', 'all')
     view_mode = request.args.get('view', 'list')
     
@@ -93,7 +112,7 @@ def index():
 
 @app.route('/create', methods=['GET', 'POST'])
 def create_task():
-    telegram_id = request.args.get('telegram_id', 123456)
+    telegram_id = get_telegram_user()
     errors = []
     
     print(f'DEBUG: /create route called - Method: {request.method}, telegram_id: {telegram_id}')
@@ -171,7 +190,7 @@ def create_task():
 
 @app.route('/task/<int:task_id>')
 def task_detail(task_id):
-    telegram_id = request.args.get('telegram_id', 123456)
+    telegram_id = get_telegram_user()
     
     session = get_session()
     task = session.query(Task).filter_by(id=task_id).first()
@@ -188,7 +207,7 @@ def task_detail(task_id):
 
 @app.route('/task/<int:task_id>/complete')
 def complete_task(task_id):
-    telegram_id = request.args.get('telegram_id', 123456)
+    telegram_id = get_telegram_user()
     
     session = get_session()
     task = session.query(Task).filter_by(id=task_id).first()
@@ -206,7 +225,7 @@ def complete_task(task_id):
 
 @app.route('/task/<int:task_id>/delete')
 def delete_task(task_id):
-    telegram_id = request.args.get('telegram_id', 123456)
+    telegram_id = get_telegram_user()
     
     session = get_session()
     task = session.query(Task).filter_by(id=task_id).first()
@@ -224,7 +243,7 @@ def delete_task(task_id):
 
 @app.route('/task/<int:task_id>/edit', methods=['GET', 'POST'])
 def edit_task(task_id):
-    telegram_id = request.args.get('telegram_id', 123456)
+    telegram_id = get_telegram_user()
     
     session = get_session()
     task = session.query(Task).filter_by(id=task_id).first()
@@ -278,7 +297,7 @@ def edit_task(task_id):
 
 @app.route('/calendar')
 def calendar():
-    telegram_id = request.args.get('telegram_id', 123456)
+    telegram_id = get_telegram_user()
     user_id = get_or_create_user(telegram_id)
     
     session = get_session()
@@ -293,7 +312,7 @@ def calendar():
 
 @app.route('/notifications')
 def notifications():
-    telegram_id = request.args.get('telegram_id', 123456)
+    telegram_id = get_telegram_user()
     user_id = get_or_create_user(telegram_id)
     
     session = get_session()
