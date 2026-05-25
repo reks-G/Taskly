@@ -9,6 +9,28 @@
     <title>{% block title %}TaskControl{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+        
+        function getTelegramId() {
+            if (window.Telegram.WebApp.initDataUnsafe.user) {
+                return window.Telegram.WebApp.initDataUnsafe.user.id;
+            }
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('telegram_id') || 123456;
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const telegramId = getTelegramId();
+            const links = document.querySelectorAll('a[href*="telegram_id"]');
+            links.forEach(link => {
+                const url = new URL(link.href, window.location.origin);
+                url.searchParams.set('telegram_id', telegramId);
+                link.href = url.toString();
+            });
+        });
+    </script>
 </head>
 <body>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">

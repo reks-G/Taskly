@@ -1,6 +1,6 @@
 from telebot import TeleBot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
-from database import init_db, get_session, Task, StatusEnum
+from database import init_db, get_session, Task, StatusEnum, User
 import threading
 import time
 from datetime import datetime, timedelta
@@ -24,11 +24,11 @@ def send_notification(telegram_id, message_text):
         return False
 
 def notify_task_created(telegram_id, task_title):
-    message = f'✅ <b>Задача создана</b>\n\n📝 {task_title}'
+    message = f'✅ <b>Задача создана</b>\n\n📝 {task_title}\n\n💡 Откройте приложение чтобы увидеть детали'
     return send_notification(telegram_id, message)
 
 def notify_task_completed(telegram_id, task_title):
-    message = f'🎉 <b>Задача завершена!</b>\n\n✓ {task_title}'
+    message = f'🎉 <b>Задача завершена!</b>\n\n✓ {task_title}\n\n👏 Отличная работа!'
     return send_notification(telegram_id, message)
 
 def notify_task_deleted(telegram_id, task_title):
@@ -36,17 +36,87 @@ def notify_task_deleted(telegram_id, task_title):
     return send_notification(telegram_id, message)
 
 def notify_task_updated(telegram_id, task_title):
-    message = f'📝 <b>Задача обновлена</b>\n\n{task_title}'
+    message = f'📝 <b>Задача обновлена</b>\n\n{task_title}\n\n✨ Изменения сохранены'
     return send_notification(telegram_id, message)
 
 @bot.message_handler(commands=['start'])
 def start_handler(message):
+    telegram_id = message.from_user.id
+    username = message.from_user.username or 'user'
+    first_name = message.from_user.first_name or 'User'
+    
+    session = get_session()
+    user = session.query(User).filter_by(telegram_id=telegram_id).first()
+    
+    if not user:
+        user = User(
+            telegram_id=telegram_id,
+            username=username,
+            first_name=first_name
+        )
+        session.add(user)
+        session.commit()
+        print(f'✅ Новый пользователь зарегистрирован: {first_name} (ID: {telegram_id})')
+    
+    session.close()
+    
     bot.send_message(
         message.chat.id,
-        f'Привет, {message.from_user.first_name}!\n\n'
-        'Открой TaskControl Mini App для управления задачами:',
-        reply_markup=webapp_button()
+        f'Привет, {first_name}! 👋\n\n'
+        '🎯 <b>TaskControl</b> - твой персональный менеджер задач\n\n'
+        '✨ Создавай задачи\n'
+        '⏰ Получай напоминания\n'
+        '📊 Отслеживай прогресс\n\n'
+        'Открой приложение чтобы начать:',
+        reply_markup=webapp_button(),
+        parse_mode='HTML'
     )
+
+@bot.message_handler(commands=['tasks'])
+def tasks_handler(message):
+    telegram_id = message.from_user.id
+    session = get_session()
+    user = session.query(User).filter_by(telegram_id=telegram_id).first()
+    
+    if not user:
+        bot.send_message(
+            message.chat.id,
+            'Сначала запустите бота командой /start',
+            reply_markup=webapp_button()
+        )
+        session.close()
+        return
+    
+    tasks = session.query(Task).filter_by(user_id=user.id).filter(
+        Task.status.in_([StatusEnum.pending, StatusEnum.in_progress])
+    ).order_by(Task.due_at).limit(5).all()
+    
+    if not tasks:
+        bot.send_message(
+            message.chat.id,
+            '📋 У вас пока нет активных задач\n\nОткройте приложение чтобы создать первую задачу:',
+            reply_markup=webapp_button()
+        )
+    else:
+        priority_emoji = {'low': '🟢', 'medium': '🟡', 'high': '🔴'}
+        message_text = '📋 <b>Ваши активные задачи:</b>\n\n'
+        
+        for i, task in enumerate(tasks, 1):
+            emoji = priority_emoji.get(task.priority.value, '⚪')
+            due_text = task.due_at.strftime('%d.%m %H:%M') if task.due_at else 'Без срока'
+            message_text += f'{i}. {emoji} <b>{task.title}</b>\n   📅 {due_text}\n\n'
+        
+        if len(tasks) == 5:
+            message_text += '\n<i>Показаны первые 5 задач</i>'
+        
+        bot.send_message(
+            message.chat.id,
+            message_text,
+            reply_markup=webapp_button(),
+            parse_mode='HTML'
+        )
+    
+    session.close()
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('complete_'))
 def handle_complete_task(call):

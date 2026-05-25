@@ -48,7 +48,12 @@ def get_or_create_user(telegram_id):
 
 @app.route('/')
 def index():
-    telegram_id = request.args.get('telegram_id', 123456)
+    telegram_id = request.args.get('telegram_id')
+    if not telegram_id:
+        telegram_id = 123456
+    else:
+        telegram_id = int(telegram_id)
+    
     filter_type = request.args.get('filter', 'all')
     view_mode = request.args.get('view', 'list')
     
