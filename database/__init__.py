@@ -3,6 +3,6 @@ from database.models import User, Task, PriorityEnum, StatusEnum
 from datetime import datetime, timedelta
 
 def get_moscow_time():
-    return datetime.utcnow() + timedelta(hours=3)
+    return datetime.utcnow() + timedelta(hours=4)
 
 __all__ = ['init_db', 'get_session', 'User', 'Task', 'PriorityEnum', 'StatusEnum', 'get_moscow_time']

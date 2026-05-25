@@ -7,7 +7,7 @@ import enum
 Base = declarative_base()
 
 def get_moscow_time():
-    return datetime.utcnow() + timedelta(hours=3)
+    return datetime.utcnow() + timedelta(hours=4)
 
 class PriorityEnum(enum.Enum):
     low = 'low'
