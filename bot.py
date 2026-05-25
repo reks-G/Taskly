@@ -15,30 +15,6 @@ def webapp_button():
     markup.add(InlineKeyboardButton('🚀 Открыть TaskControl', web_app=WebAppInfo(url=WEBAPP_URL)))
     return markup
 
-def send_notification(telegram_id, message_text):
-    try:
-        bot.send_message(telegram_id, message_text, reply_markup=webapp_button())
-        return True
-    except Exception as e:
-        print(f'Ошибка отправки уведомления: {e}')
-        return False
-
-def notify_task_created(telegram_id, task_title):
-    message = f'✅ <b>Задача создана</b>\n\n📝 {task_title}\n\n💡 Откройте приложение чтобы увидеть детали'
-    return send_notification(telegram_id, message)
-
-def notify_task_completed(telegram_id, task_title):
-    message = f'🎉 <b>Задача завершена!</b>\n\n✓ {task_title}\n\n👏 Отличная работа!'
-    return send_notification(telegram_id, message)
-
-def notify_task_deleted(telegram_id, task_title):
-    message = f'🗑 <b>Задача удалена</b>\n\n{task_title}'
-    return send_notification(telegram_id, message)
-
-def notify_task_updated(telegram_id, task_title):
-    message = f'📝 <b>Задача обновлена</b>\n\n{task_title}\n\n✨ Изменения сохранены'
-    return send_notification(telegram_id, message)
-
 @bot.message_handler(commands=['start'])
 def start_handler(message):
     telegram_id = message.from_user.id

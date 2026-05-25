@@ -46,17 +46,6 @@ def get_telegram_user():
     
     return 123456
 
-def send_notification_async(telegram_id, notification_func, *args):
-    def send():
-        try:
-            from bot import notify_task_created, notify_task_completed, notify_task_deleted, notify_task_updated
-            notification_func(telegram_id, *args)
-        except Exception as e:
-            print(f'Ошибка отправки уведомления: {e}')
-    
-    thread = threading.Thread(target=send, daemon=True)
-    thread.start()
-
 def get_or_create_user(telegram_id):
     session = get_session()
     user = session.query(User).filter_by(telegram_id=telegram_id).first()
@@ -178,9 +167,6 @@ def create_task():
             finally:
                 session.close()
             
-            from bot import notify_task_created
-            send_notification_async(telegram_id, notify_task_created, title)
-            
             return redirect(url_for('index', telegram_id=telegram_id))
         else:
             print(f'DEBUG: Errors: {errors}')
@@ -214,11 +200,7 @@ def complete_task(task_id):
     
     if task:
         task.status = StatusEnum.completed
-        task_title = task.title
         session.commit()
-        
-        from bot import notify_task_completed
-        send_notification_async(telegram_id, notify_task_completed, task_title)
     
     session.close()
     return redirect(url_for('index', telegram_id=telegram_id))
@@ -231,12 +213,8 @@ def delete_task(task_id):
     task = session.query(Task).filter_by(id=task_id).first()
     
     if task:
-        task_title = task.title
         session.delete(task)
         session.commit()
-        
-        from bot import notify_task_deleted
-        send_notification_async(telegram_id, notify_task_deleted, task_title)
     
     session.close()
     return redirect(url_for('index', telegram_id=telegram_id))
@@ -283,9 +261,6 @@ def edit_task(task_id):
             
             session.commit()
             session.close()
-            
-            from bot import notify_task_updated
-            send_notification_async(telegram_id, notify_task_updated, title)
             
             return redirect(url_for('task_detail', task_id=task_id, telegram_id=telegram_id))
     
