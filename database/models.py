@@ -1,13 +1,13 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Enum, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timedelta
 import enum
 
 Base = declarative_base()
 
 def get_moscow_time():
-    return datetime.now()
+    return datetime.utcnow() + timedelta(hours=3)
 
 class PriorityEnum(enum.Enum):
     low = 'low'
