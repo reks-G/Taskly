@@ -1,6 +1,6 @@
 from telebot import TeleBot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
-from database import init_db, get_session, Task, StatusEnum, User
+from database import init_db, get_session, Task, StatusEnum, User, get_moscow_time
 import threading
 import time
 from datetime import datetime, timedelta
@@ -125,7 +125,7 @@ def check_upcoming_tasks():
     while True:
         try:
             session = get_session()
-            now = datetime.now()
+            now = get_moscow_time()
             
             start_window = now + timedelta(minutes=10)
             end_window = now + timedelta(minutes=20)
@@ -178,7 +178,7 @@ def cleanup_old_tasks(session, now):
         print(f'❌ Ошибка очистки старых задач: {e}')
 
 def send_deadline_reminder(telegram_id, task):
-    time_left = task.due_at - datetime.now()
+    time_left = task.due_at - get_moscow_time()
     minutes_left = int(time_left.total_seconds() / 60)
     
     priority_emoji = {

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from database import get_session, User, Task, PriorityEnum, StatusEnum, init_db
+from database import get_session, User, Task, PriorityEnum, StatusEnum, init_db, get_moscow_time
 from datetime import datetime, timedelta
 from functools import lru_cache
 import threading
@@ -70,7 +70,7 @@ def index():
     session = get_session()
     query = session.query(Task).filter_by(user_id=user_id)
     
-    now = datetime.now()
+    now = get_moscow_time()
     if filter_type == 'today':
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         today_end = today_start + timedelta(days=1)
@@ -171,7 +171,7 @@ def create_task():
         else:
             print(f'DEBUG: Errors: {errors}')
     
-    default_datetime = datetime.now().strftime('%Y-%m-%dT%H:%M')
+    default_datetime = get_moscow_time().strftime('%Y-%m-%dT%H:%M')
     return render_template('create.html', telegram_id=telegram_id, errors=errors, default_datetime=default_datetime)
 
 @app.route('/task/<int:task_id>')
@@ -291,7 +291,7 @@ def notifications():
     user_id = get_or_create_user(telegram_id)
     
     session = get_session()
-    now = datetime.now()
+    now = get_moscow_time()
     notification_window = now + timedelta(hours=24)
     
     tasks = session.query(Task).filter_by(user_id=user_id).filter(

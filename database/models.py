@@ -1,11 +1,16 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Enum, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from datetime import datetime, timezone
+from datetime import datetime
 import enum
 import pytz
 
 Base = declarative_base()
+
+MOSCOW_TZ = pytz.timezone('Europe/Moscow')
+
+def get_moscow_time():
+    return datetime.now(MOSCOW_TZ).replace(tzinfo=None)
 
 class PriorityEnum(enum.Enum):
     low = 'low'
@@ -25,14 +30,13 @@ class User(Base):
     telegram_id = Column(Integer, unique=True, nullable=False)
     username = Column(String(255))
     first_name = Column(String(255))
-    created_at = Column(DateTime, default=lambda: datetime.now())
+    created_at = Column(DateTime, default=get_moscow_time)
     timezone = Column(String(50), default='Europe/Moscow')
     
     tasks = relationship('Task', back_populates='user', cascade='all, delete-orphan')
     
     def get_local_time(self):
-        tz = pytz.timezone(self.timezone)
-        return datetime.now(tz)
+        return get_moscow_time()
 
 class Task(Base):
     __tablename__ = 'tasks'
@@ -41,7 +45,7 @@ class Task(Base):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     title = Column(String(500), nullable=False)
     description = Column(Text)
-    created_at = Column(DateTime, default=lambda: datetime.now())
+    created_at = Column(DateTime, default=get_moscow_time)
     due_at = Column(DateTime)
     priority = Column(Enum(PriorityEnum), default=PriorityEnum.medium)
     status = Column(Enum(StatusEnum), default=StatusEnum.pending)
