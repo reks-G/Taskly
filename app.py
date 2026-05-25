@@ -133,8 +133,7 @@ def create_task():
                 title=title,
                 description=description if description else None,
                 due_at=due_at,
-                priority=PriorityEnum[priority],
-                notified=False
+                priority=PriorityEnum[priority]
             )
             
             session.add(task)
@@ -235,7 +234,6 @@ def edit_task(task_id):
             task.description = description if description else None
             task.due_at = due_at
             task.priority = PriorityEnum[priority]
-            task.notified = False
             
             try:
                 session.commit()
