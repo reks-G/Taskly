@@ -4,7 +4,6 @@ from bot import bot, start_scheduler
 from database import init_db
 
 def run_bot():
-    print('Bot started')
     bot.infinity_polling()
 
 if __name__ == '__main__':

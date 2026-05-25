@@ -32,7 +32,6 @@ def start_handler(message):
         )
         session.add(user)
         session.commit()
-        print(f'✅ Новый пользователь зарегистрирован: {first_name} (ID: {telegram_id})')
     
     session.close()
     
@@ -118,7 +117,6 @@ def handle_complete_task(call):
         
         session.close()
     except Exception as e:
-        print(f'Ошибка обработки callback: {e}')
         bot.answer_callback_query(call.id, '❌ Произошла ошибка')
 
 def check_upcoming_tasks():
@@ -145,17 +143,15 @@ def check_upcoming_tasks():
                     task.notified = True
                     session.commit()
                     
-                    print(f'✅ Отправлено напоминание для задачи: {task.title}')
-                    
                 except Exception as e:
-                    print(f'❌ Ошибка отправки уведомления для задачи {task.id}: {e}')
+                    pass
             
             cleanup_old_tasks(session, now)
             
             session.close()
             
         except Exception as e:
-            print(f'❌ Ошибка проверки задач: {e}')
+            pass
         
         time.sleep(300)
 
@@ -173,9 +169,8 @@ def cleanup_old_tasks(session, now):
             for task in old_tasks:
                 session.delete(task)
             session.commit()
-            print(f'🗑 Удалено {len(old_tasks)} просроченных задач старше недели')
     except Exception as e:
-        print(f'❌ Ошибка очистки старых задач: {e}')
+        pass
 
 def send_deadline_reminder(telegram_id, task):
     time_left = task.due_at - get_moscow_time()
@@ -224,15 +219,13 @@ def send_deadline_reminder(telegram_id, task):
             reply_markup=markup
         )
     except Exception as e:
-        print(f'Ошибка отправки сообщения: {e}')
+        pass
 
 def start_scheduler():
     scheduler_thread = threading.Thread(target=check_upcoming_tasks, daemon=True)
     scheduler_thread.start()
-    print('📅 Планировщик уведомлений запущен')
 
 if __name__ == '__main__':
     init_db()
     start_scheduler()
-    print('Bot started')
     bot.infinity_polling()

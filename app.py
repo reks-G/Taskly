@@ -88,7 +88,6 @@ def index():
         query = query.filter(Task.status.in_([StatusEnum.pending, StatusEnum.in_progress]))
     
     tasks = query.order_by(Task.due_at).all()
-    print(f'DEBUG: Retrieved {len(tasks)} tasks for user_id={user_id}, filter={filter_type}')
     session.close()
     
     return render_template('index.html', 
@@ -104,17 +103,11 @@ def create_task():
     telegram_id = get_telegram_user()
     errors = []
     
-    print(f'DEBUG: /create route called - Method: {request.method}, telegram_id: {telegram_id}')
-    
     if request.method == 'POST':
-        print(f'DEBUG: Form data received: {dict(request.form)}')
-        
         title = request.form.get('title', '').strip()
         description = request.form.get('description', '').strip()
         priority = request.form.get('priority', 'medium')
         due_at_str = request.form.get('due_at', '')
-        
-        print(f'DEBUG: Creating task - title={title}, priority={priority}, due_at={due_at_str}')
         
         if not title:
             errors.append('Task title is required')
@@ -123,7 +116,6 @@ def create_task():
         
         if priority not in ['low', 'medium', 'high']:
             errors.append('Invalid priority value')
-            print(f'DEBUG: Invalid priority: {priority}')
         
         due_at = None
         if due_at_str:
@@ -134,8 +126,6 @@ def create_task():
         
         if not errors:
             user_id = get_or_create_user(telegram_id)
-            print(f'DEBUG: User ID: {user_id}')
-            
             session = get_session()
             
             task = Task(
@@ -146,30 +136,16 @@ def create_task():
                 priority=PriorityEnum[priority]
             )
             
-            print(f'DEBUG: Task object created: {task}')
             session.add(task)
-            print(f'DEBUG: Task added to session')
             
             try:
                 session.commit()
-                task_id = task.id
-                print(f'DEBUG: Task committed successfully with ID: {task_id}')
-                
-                verify_task = session.query(Task).filter_by(id=task_id).first()
-                if verify_task:
-                    print(f'DEBUG: Task verified in DB: ID={verify_task.id}, Title={verify_task.title}')
-                else:
-                    print(f'DEBUG: WARNING - Task not found after commit!')
-                    
             except Exception as e:
-                print(f'DEBUG: Error during commit: {e}')
                 session.rollback()
             finally:
                 session.close()
             
             return redirect(url_for('index', telegram_id=telegram_id))
-        else:
-            print(f'DEBUG: Errors: {errors}')
     
     default_datetime = get_moscow_time().strftime('%Y-%m-%dT%H:%M')
     return render_template('create.html', telegram_id=telegram_id, errors=errors, default_datetime=default_datetime)
