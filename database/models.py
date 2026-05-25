@@ -3,14 +3,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
-import pytz
 
 Base = declarative_base()
 
-MOSCOW_TZ = pytz.timezone('Europe/Moscow')
-
 def get_moscow_time():
-    return datetime.now(MOSCOW_TZ).replace(tzinfo=None)
+    return datetime.now()
 
 class PriorityEnum(enum.Enum):
     low = 'low'
