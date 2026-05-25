@@ -125,27 +125,6 @@ def check_upcoming_tasks():
             session = get_session()
             now = get_moscow_time()
             
-            start_window = now + timedelta(minutes=10)
-            end_window = now + timedelta(minutes=20)
-            
-            tasks = session.query(Task).filter(
-                Task.due_at >= start_window,
-                Task.due_at <= end_window,
-                Task.status.in_([StatusEnum.pending, StatusEnum.in_progress]),
-                Task.notified == False
-            ).all()
-            
-            for task in tasks:
-                try:
-                    telegram_id = task.user.telegram_id
-                    send_deadline_reminder(telegram_id, task)
-                    
-                    task.notified = True
-                    session.commit()
-                    
-                except Exception as e:
-                    pass
-            
             cleanup_old_tasks(session, now)
             
             session.close()
@@ -169,55 +148,6 @@ def cleanup_old_tasks(session, now):
             for task in old_tasks:
                 session.delete(task)
             session.commit()
-    except Exception as e:
-        pass
-
-def send_deadline_reminder(telegram_id, task):
-    time_left = task.due_at - get_moscow_time()
-    minutes_left = int(time_left.total_seconds() / 60)
-    
-    priority_emoji = {
-        'low': '🟢',
-        'medium': '🟡',
-        'high': '🔴'
-    }
-    
-    message = f"""
-⏰ <b>Напоминание о задаче</b>
-
-{priority_emoji.get(task.priority.value, '⚪')} <b>{task.title}</b>
-
-⏱ Осталось времени: <b>{minutes_left} минут</b>
-📅 Дедлайн: {task.due_at.strftime('%d.%m.%Y в %H:%M')}
-
-{'📝 ' + task.description[:100] + '...' if task.description and len(task.description) > 100 else '📝 ' + task.description if task.description else ''}
-
-<i>Не забудьте выполнить задачу вовремя! 💪</i>
-"""
-    
-    markup = InlineKeyboardMarkup()
-    task_url = f"{WEBAPP_URL}/task/{task.id}?telegram_id={telegram_id}"
-    
-    markup.add(
-        InlineKeyboardButton(
-            '👁 Открыть задачу',
-            web_app=WebAppInfo(url=task_url)
-        )
-    )
-    markup.add(
-        InlineKeyboardButton(
-            '✅ Отметить выполненной',
-            callback_data=f'complete_{task.id}'
-        )
-    )
-    
-    try:
-        bot.send_message(
-            telegram_id,
-            message,
-            parse_mode='HTML',
-            reply_markup=markup
-        )
     except Exception as e:
         pass
 
