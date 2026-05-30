@@ -7,9 +7,13 @@ import json
 import hmac
 import hashlib
 from urllib.parse import parse_qs
+import os
+from dotenv import load_dotenv
 
-BOT_TOKEN = '8534316351:AAE-aCnUKL0jBNDlDV1jRaUjH_45Nhocggc'
-WEBAPP_URL = 'https://taskcontrol-qu0a.onrender.com'
+load_dotenv()
+
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+WEBAPP_URL = os.getenv('WEBAPP_URL')
 
 PRIORITY_LEVELS = {
     'low': '🟢',
@@ -227,7 +231,7 @@ def edit_task(task_id):
             try:
                 due_at = datetime.fromisoformat(due_at_str)
             except ValueError:
-                errors.append('Неверный формат даты')
+                errors.append('Неверный формат даты')   
         
         if not errors:
             task.title = title

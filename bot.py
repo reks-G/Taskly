@@ -4,9 +4,13 @@ from database import init_db, get_session, Task, StatusEnum, User, get_moscow_ti
 import threading
 import time
 from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
 
-BOT_TOKEN = '8534316351:AAE-aCnUKL0jBNDlDV1jRaUjH_45Nhocggc'
-WEBAPP_URL = 'https://taskcontrol-qu0a.onrender.com'
+load_dotenv()
+
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+WEBAPP_URL = os.getenv('WEBAPP_URL')
 
 bot = TeleBot(BOT_TOKEN, parse_mode='HTML')
 
