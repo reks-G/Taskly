@@ -12,8 +12,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-BOT_TOKEN = os.getenv('BOT_TOKEN')
-WEBAPP_URL = os.getenv('WEBAPP_URL')
+BOT_TOKEN = os.getenv('BOT_TOKEN', '8534316351:AAE-aCnUKL0jBNDlDV1jRaUjH_45Nhocggc')
+WEBAPP_URL = os.getenv('WEBAPP_URL', 'https://taskcontrol-qu0a.onrender.com')
 
 PRIORITY_LEVELS = {
     'low': '🟢',
